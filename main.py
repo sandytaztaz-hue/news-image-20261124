@@ -1,50 +1,52 @@
 #!/usr/bin/env python3
-"""Copy the shipped entry.png to the grader output directory.
+"""news-image-20261124 — copy the shipped entry.png to the output directory.
 
-Standard library only: no Pillow, no fonts, no network.
-Deterministic: the output is a byte-for-byte copy of the shipped image.
+Render: map pins 3 (Cikande, centred on Java) and 13 (Wellington, on the
+New Zealand sliver) sit on their islands, each with a 1px leader line to
+its true spot. The other 10 pins are at their true or cluster-offset spots.
+
+Standard library only (the grader container has no third-party packages).
+Reads the output directory from MAKEFUN_OUTPUT_DIR and falls back to
+/output when that variable is absent. Verifies the copied file's SHA-256
+against the hash baked in below and exits non-zero on any mismatch.
 """
+
 import hashlib
 import os
 import shutil
 import sys
 
-EXPECTED_SHA256 = "acb89b67815e0d82c5f8caa2d96976f7df5a86dda7fc0b678c70e5abdad0046b"
-EXPECTED_SIZE = 132850
+# SHA-256 of the shipped entry.png (1024x1024, 224932 bytes).
+EXPECTED_SHA256 = "1bf3ababcb5694ac658184d934cc4ec63f04df691580ae00243fca248a41e334"
 
 
 def main():
-    bot_dir = os.environ.get("MAKEFUN_BOT_DIR")
-    if not bot_dir:
-        bot_dir = os.path.dirname(os.path.abspath(__file__))
-    src = os.path.join(bot_dir, "entry.png")
-
-    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
+    here = os.path.dirname(os.path.abspath(__file__))
+    src = os.path.join(here, "entry.png")
+    if not os.path.isfile(src):
+        print("error: shipped entry.png not found next to main.py", file=sys.stderr)
+        return 1
+    out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR")
+    if not out_dir and "--output" in sys.argv:
+        idx = sys.argv.index("--output")
+        if idx + 1 < len(sys.argv):
+            out_dir = sys.argv[idx + 1]
+    if not out_dir:
+        out_dir = "/output"
     os.makedirs(out_dir, exist_ok=True)
     dst = os.path.join(out_dir, "entry.png")
-
     shutil.copyfile(src, dst)
-
     digest = hashlib.sha256()
-    size = 0
-    with open(dst, "rb") as f:
-        while True:
-            chunk = f.read(65536)
-            if not chunk:
-                break
-            size += len(chunk)
+    with open(dst, "rb") as fh:
+        for chunk in iter(lambda: fh.read(65536), b""):
             digest.update(chunk)
-    sha = digest.hexdigest()
-
-    if size != EXPECTED_SIZE or sha != EXPECTED_SHA256:
-        print(
-            "mismatch: copied %d bytes sha256=%s, expected %d bytes sha256=%s"
-            % (size, sha, EXPECTED_SIZE, EXPECTED_SHA256),
-            file=sys.stderr,
-        )
+    actual = digest.hexdigest()
+    if actual != EXPECTED_SHA256:
+        print("error: SHA-256 mismatch for %s" % dst, file=sys.stderr)
+        print("  expected %s" % EXPECTED_SHA256, file=sys.stderr)
+        print("  actual   %s" % actual, file=sys.stderr)
         return 1
-
-    print("wrote %s (%d bytes, sha256=%s)" % (dst, size, sha))
+    print("wrote %s sha256=%s" % (dst, actual))
     return 0
 
 
