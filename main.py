@@ -409,18 +409,15 @@ assert len(GRID) == 33, len(GRID)
 HEROES = [
     ("SPORT  •  CHESS  •  TUESDAY", "Youngest title match ever begins in Geneva",
      "Gukesh Dommaraju, 20, defends against Javokhir Sindarov, 20, in a 14-game "
-     "match, first to 7.5 points, for a $2.5 million prize. Game 1 starts at "
-     "15:00 CET at the Fondation Martin Bodmer, Cologny; Sindarov has White.",
+     "match, first to 7.5 points, for a $2.5 million prize.",
      "chess"),
     ("ASIA-PACIFIC  •  INDONESIA  •  TUESDAY", "Search goes on for about 30 missing after factory fire",
-     "Rescuers are still searching today in Cikande, Banten, after the candy-factory "
-     "fire. 24 people are confirmed dead; 29 are confirmed safe, 5 in hospital. "
-     "The burned building is unstable, with hotspots still smouldering.",
+     "Rescuers are still searching today in Cikande after the candy-factory "
+     "fire. 24 dead; 29 safe, 5 in hospital.",
      "fire"),
     ("EUROPE  •  UKRAINE  •  TUESDAY", "Zelensky warns of new Russian strikes",
-     "President Zelensky says intelligence shows Russia is planning new strikes on "
-     "Ukraine. Russian strikes hit the Kyiv region, including a residential "
-     "building in Dymer, where rescue work is under way.",
+     "President Zelensky says intelligence shows Russia is planning new strikes. "
+     "Russian strikes hit the Kyiv region, including a home in Dymer.",
      "dymer"),
 ]
 
